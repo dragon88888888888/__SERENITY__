@@ -1,0 +1,116 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+.header {
+    position: absolute;
+    top: 2rem;
+    left: 8rem;
+    font-size: 1rem;
+}
+
+.title {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.profilePic {
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+    margin-bottom: 10px;
+}
+
+.label {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.inputBox {
+    width: 100%;
+    height: 2.5rem;
+    border: 3px solid black;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    padding: 10px;
+}
+
+.smallBox {
+    width: 80% !important;
+}
+
+.twoInputs {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    position: absolute;
+    left: 20%;
+    top: 20%;
+}
+
+.rightColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+}
+
+.buttonMark:hover {
+    background-color: #000000;
+    border-color: #000000;
+    color: #fff;
+    box-shadow: 7px 7px 0 #000000;
+}
+
+/* Media Queries para pantallas pequeñas */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .inputBox {
+        width: 100%;
+    }
+
+    .twoInputs {
+        flex-direction: column;
+    }
+
+    .smallBox {
+        width: 100% !important;
+    }
+
+    .leftColumn {
+        position: static;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .profilePic {
+        margin-bottom: 20px;
+    }
+
+    .rightColumn {
+        width: 90%;
+        justify-content: flex-start;
+        padding: 0 1rem;
+    }
+
+    .header {
+        left: 2rem;
+    }
+}

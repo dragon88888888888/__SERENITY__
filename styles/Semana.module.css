@@ -1,0 +1,153 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 4rem;
+    justify-content: center;
+}
+
+.viewSelector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10%;
+    gap: 3rem;
+}
+
+.buttonsGroup {
+    display: flex;
+    gap: 7rem;
+    justify-content: center;
+}
+
+.gifPlaceholder {
+    width: 300px;
+    height: 200px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #000;
+    border-radius: 8px;
+}
+
+.calendarView {
+    padding: 2rem;
+}
+
+.calendarGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.calendarGrid button {
+    flex: 0 1 auto;
+    min-width: 150px;
+}
+
+.backButton {
+    margin-bottom: 2rem;
+}
+
+/* Para tablets */
+@media screen and (max-width: 1024px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    .buttonsGroup {
+        gap: 3rem;
+    }
+
+    .viewSelector {
+        margin-top: 15%;
+    }
+
+    .gifPlaceholder {
+        width: 250px;
+        height: 150px;
+    }
+}
+
+/* Para móviles */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        margin-bottom: 2rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .viewSelector {
+        margin-top: 20%;
+        gap: 3rem;
+    }
+
+    .buttonsGroup {
+        gap: 1.5rem;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+    }
+
+    .buttonsGroup button {
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .gifPlaceholder {
+        width: 280px;
+        height: 160px;
+        margin-top: 2rem;
+    }
+
+    /* Ajustes para la vista de calendario */
+    .calendarGrid {
+        gap: 1.5rem;
+    }
+
+    .calendarGrid button {
+        min-width: 140px;
+    }
+
+    .backButton {
+        width: 80%;
+        max-width: 300px;
+        margin: 1.5rem auto 2rem auto;
+    }
+}
+
+/* Para móviles muy pequeños */
+@media screen and (max-width: 480px) {
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .viewSelector {
+        margin-top: 15%;
+    }
+
+    .buttonsGroup button {
+        width: 90%;
+        font-size: 1.1rem;
+    }
+
+    .gifPlaceholder {
+        width: 240px;
+        height: 140px;
+    }
+}

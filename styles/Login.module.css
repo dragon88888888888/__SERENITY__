@@ -1,0 +1,79 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+}
+
+.header {
+    position: absolute;
+    top: 2rem;
+    left: 8rem;
+    font-size: 1rem;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.profilePic {
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+    margin-bottom: 20px;
+}
+
+.label {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.inputBox {
+    width: 300px;
+    height: 2.5rem;
+    border: 3px solid black;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    padding: 10px;
+}
+
+.textVisible {
+    font-size: 1rem !important;
+}
+
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.buttonMark:hover {
+    background-color: #000000;
+    border-color: #000000;
+    color: #fff;
+    box-shadow: 7px 7px 0 #000000;
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 768px) {
+    .header {
+        left: 2rem;
+    }
+
+    .inputBox {
+        width: 100%;
+        max-width: 250px;
+    }
+}

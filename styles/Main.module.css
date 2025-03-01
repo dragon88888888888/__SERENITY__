@@ -1,0 +1,130 @@
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    border: 2px solid black;
+}
+
+.title {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.title h1 {
+    font-size: 4rem;
+    font-weight: 100 !important;
+    margin-bottom: 0.5rem;
+}
+
+.title h2 {
+    font-size: 2rem;
+    font-weight: 100;
+    margin-top: 0;
+}
+
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10%;
+}
+
+.voiceChat {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.options {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 2rem;
+}
+
+.sidebar {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.icon button {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    color: black;
+    border: none !important;
+    box-shadow: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    flex-direction: column;
+}
+
+.icon button i {
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+}
+
+.imagePlaceholder {
+    position: absolute;
+    top: 20px;
+    left: 50px;
+    width: 200px;
+    height: 200px;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .title h1 {
+        font-size: 3rem;
+    }
+
+    .title h2 {
+        font-size: 1.5rem;
+    }
+
+    .options {
+        flex-direction: column;
+    }
+
+    .imagePlaceholder {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 1rem;
+    }
+
+    .sidebar {
+        position: relative;
+        right: 0;
+        top: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .icon {
+        margin: 0 10px;
+    }
+}

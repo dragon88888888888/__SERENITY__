@@ -1,0 +1,170 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Balsamiq Sans', cursive;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.headerIcon {
+    font-size: 2rem;
+}
+
+.settingsContainer {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.settingSection {
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: #fff;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.settingHeader {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
+}
+
+.languageOptions,
+.toggleOptions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+
+.languageOption,
+.toggleOption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.toggle {
+    width: 50px;
+    height: 24px;
+    background-color: #ddd;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: 2px solid #000;
+}
+
+.toggle.active {
+    background-color: #9fb4ff;
+}
+
+.toggleHandle {
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 2px;
+    transition: left 0.3s;
+    border: 1px solid #000;
+}
+
+.toggle.active .toggleHandle {
+    left: calc(100% - 22px);
+}
+
+.saveButton {
+    margin-top: 1.5rem;
+    padding: 1rem 2rem;
+    background-color: #9fb4ff;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 3px 3px 0 #000;
+    align-self: center;
+}
+
+.saveButton:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+}
+
+.saveButton:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.backButton {
+    margin-top: 2rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.backButton:hover {
+    background-color: #f0f0f0;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .headerIcon {
+        font-size: 1.5rem;
+    }
+
+    .settingSection {
+        padding: 1rem;
+    }
+
+    .settingHeader {
+        font-size: 1.1rem;
+    }
+
+    .languageOptions,
+    .toggleOptions {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .languageOption,
+    .toggleOption {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .saveButton {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}

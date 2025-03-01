@@ -1,0 +1,167 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: 'Balsamiq Sans', cursive;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.headerIcon {
+    font-size: 2rem;
+}
+
+.supportForm {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.input,
+.textarea {
+    padding: 1rem;
+    border: 2px solid #000;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: 'Balsamiq Sans', cursive;
+    background-color: #fff;
+    box-shadow: 3px 3px 0 #000;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 #000;
+    transform: translate(-1px, -1px);
+}
+
+.submitButton {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #9fb4ff;
+    border: 2px solid #000;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.2s ease;
+    align-self: center;
+}
+
+.submitButton:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+}
+
+.submitButton:active:not(:disabled) {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.submitButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.backLink {
+    margin-top: 2rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.backLink:hover {
+    background-color: #f0f0f0;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.successMessage {
+    text-align: center;
+    background-color: #e6ffe6;
+    border: 2px solid #000;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0 #000;
+    max-width: 600px;
+    width: 100%;
+}
+
+.successMessage h2 {
+    margin-top: 0;
+}
+
+.backButton {
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #9fb4ff;
+    border: 2px solid #000;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .headerIcon {
+        font-size: 1.5rem;
+    }
+
+    .supportForm {
+        width: 100%;
+    }
+
+    .input,
+    .textarea {
+        padding: 0.8rem;
+    }
+
+    .submitButton {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+}

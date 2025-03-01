@@ -36,7 +36,7 @@ export default function Main() {
                 </div>
 
                 <div className={styles.options}>
-                    <button>
+                    <button onClick={() => router.push('/contacts')}>
                         <FontAwesomeIcon icon={faUser} /> contactos
                     </button>
                     <button onClick={() => router.push('/semana')}>
@@ -47,22 +47,22 @@ export default function Main() {
 
             <div className={styles.sidebar}>
                 <div className={styles.icon}>
-                    <button>
+                    <button onClick={() => router.push('/settings')}>
                         <FontAwesomeIcon icon={faCog} /> configuración
                     </button>
                 </div>
                 <div className={styles.icon}>
-                    <button>
+                    <button onClick={() => router.push('/notifications')}>
                         <FontAwesomeIcon icon={faBell} /> Notificaciones
                     </button>
                 </div>
                 <div className={styles.icon}>
-                    <button>
+                    <button onClick={() => router.push('/support')}>
                         <FontAwesomeIcon icon={faQuestionCircle} /> Soporte Técnico
                     </button>
                 </div>
                 <div className={styles.icon}>
-                    <button>
+                    <button onClick={() => router.push('/account')}>
                         <FontAwesomeIcon icon={faUserCircle} /> Cuenta
                     </button>
                 </div>

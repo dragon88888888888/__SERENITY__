@@ -10,6 +10,8 @@ export default function Login() {
         usuario: '',
         password: ''
     });
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -17,6 +19,8 @@ export default function Login() {
             ...prev,
             [id]: value
         }));
+        // Limpiar mensaje de error cuando el usuario empieza a escribir
+        if (error) setError('');
     };
 
     const togglePassword = () => {
@@ -25,32 +29,37 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
 
         try {
-            // En una implementación real, aquí harías una petición a tu API
-            // const response = await fetch('/api/auth/login', {
-            //   method: 'POST',
-            //   headers: {
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify(formData),
-            // });
+            // Realizar la petición a la API de login
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-            // if (response.ok) {
-            //   const data = await response.json();
-            //   // Guardar token o información de usuario si es necesario
-            //   router.push('/main');
-            // } else {
-            //   alert('Credenciales incorrectas');
-            // }
+            const data = await response.json();
 
-            // Por ahora, simulamos un inicio de sesión exitoso
-            console.log('Iniciando sesión con:', formData);
-            router.push('/main');
+            if (response.ok) {
+                // Guardar token e información del usuario
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
 
+                // Redireccionar a la página principal
+                router.push('/main');
+            } else {
+                // Mostrar mensaje de error
+                setError(data.message || 'Error al iniciar sesión');
+            }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
-            alert('Error al conectar con el servidor');
+            setError('Error al conectar con el servidor');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -67,7 +76,7 @@ export default function Login() {
                 <div className={styles.title}>Serenity</div>
 
                 <img
-                    alt="Placeholder image of a smiling face"
+                    alt="Logo de Serenity"
                     className={styles.profilePic}
                     height="150"
                     src="/serenity.jpeg"
@@ -75,6 +84,8 @@ export default function Login() {
                 />
 
                 <form onSubmit={handleSubmit}>
+                    {error && <div className={styles.errorMessage}>{error}</div>}
+
                     <div className={styles.label}>usuario</div>
                     <input
                         className={styles.inputBox}
@@ -82,6 +93,7 @@ export default function Login() {
                         id="usuario"
                         value={formData.usuario}
                         onChange={handleChange}
+                        required
                     />
 
                     <div className={styles.label} style={{ marginBottom: '1rem' }}>contraseña</div>
@@ -91,6 +103,7 @@ export default function Login() {
                         id="password"
                         value={formData.password}
                         onChange={handleChange}
+                        required
                     />
 
                     <div className={styles.checkboxContainer}>
@@ -103,8 +116,12 @@ export default function Login() {
                         <label htmlFor="showPassword">Mostrar contraseña</label>
                     </div>
 
-                    <button type="submit" className={styles.buttonMark}>
-                        iniciar sesion
+                    <button
+                        type="submit"
+                        className={styles.buttonMark}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Iniciando sesión...' : 'iniciar sesion'}
                     </button>
                 </form>
             </div>

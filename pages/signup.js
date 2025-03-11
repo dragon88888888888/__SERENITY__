@@ -5,6 +5,7 @@ import styles from '../styles/Signup.module.css';
 
 export default function Signup() {
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         usuario: '',
         password: '',
@@ -12,6 +13,9 @@ export default function Signup() {
         edad: '',
         genero: ''
     });
+    const [otroGenero, setOtroGenero] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -19,35 +23,62 @@ export default function Signup() {
             ...prev,
             [id]: value
         }));
+        // Limpiar mensaje de error cuando el usuario empieza a escribir
+        if (error) setError('');
+    };
+
+    const togglePassword = () => {
+        setShowPassword(prev => !prev);
+    };
+
+    const handleGeneroChange = (e) => {
+        const value = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            genero: value === 'otro' ? otroGenero : value
+        }));
+    };
+
+    const handleOtroGeneroChange = (e) => {
+        const value = e.target.value;
+        setOtroGenero(value);
+        if (formData.genero === 'otro' || formData.genero === '') {
+            setFormData(prev => ({
+                ...prev,
+                genero: value
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
 
         try {
-            // En una implementación real, aquí harías una petición a tu API
-            // const response = await fetch('/api/auth/register', {
-            //   method: 'POST',
-            //   headers: {
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify(formData),
-            // });
+            // Realizar la petición a la API de registro
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-            // if (response.ok) {
-            //   const data = await response.json();
-            //   router.push('/login');
-            // } else {
-            //   alert('Error al registrar usuario');
-            // }
+            const data = await response.json();
 
-            // Por ahora, simulamos un registro exitoso
-            console.log('Registrando usuario:', formData);
-            router.push('/login');
-
+            if (response.ok) {
+                // Registro exitoso, redirigir a la página de inicio de sesión
+                router.push('/login');
+            } else {
+                // Mostrar mensaje de error
+                setError(data.message || 'Error al registrar usuario');
+            }
         } catch (error) {
             console.error('Error al registrar:', error);
-            alert('Error al conectar con el servidor');
+            setError('Error al conectar con el servidor');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -62,7 +93,7 @@ export default function Signup() {
 
             <div className={styles.leftColumn}>
                 <img
-                    alt="Placeholder image of a smiling face"
+                    alt="Logo de Serenity"
                     className={styles.profilePic}
                     height="150"
                     src="/serenity.jpeg"
@@ -74,6 +105,8 @@ export default function Signup() {
                 <div className={styles.title}>Serenity</div>
 
                 <form onSubmit={handleSubmit}>
+                    {error && <div className={styles.errorMessage}>{error}</div>}
+
                     <div className={styles.label}>Usuario</div>
                     <input
                         className={styles.inputBox}
@@ -85,14 +118,26 @@ export default function Signup() {
                     />
 
                     <div className={styles.label}>Contraseña</div>
-                    <input
-                        className={styles.inputBox}
-                        type="password"
-                        id="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className={styles.passwordContainer}>
+                        <input
+                            className={`${styles.inputBox} ${showPassword ? styles.textVisible : ''}`}
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.checkboxContainer}>
+                        <input
+                            type="checkbox"
+                            id="showPassword"
+                            checked={showPassword}
+                            onChange={togglePassword}
+                        />
+                        <label htmlFor="showPassword">Mostrar contraseña</label>
+                    </div>
 
                     <div className={styles.label}>Correo</div>
                     <input
@@ -118,19 +163,41 @@ export default function Signup() {
                         </div>
                         <div>
                             <label className={styles.label}>Género</label>
-                            <input
+                            <select
                                 className={`${styles.inputBox} ${styles.smallBox}`}
-                                type="text"
-                                id="genero"
-                                value={formData.genero}
-                                onChange={handleChange}
+                                id="genero-select"
+                                value={formData.genero === 'Hombre' || formData.genero === 'Mujer' ? formData.genero : 'otro'}
+                                onChange={handleGeneroChange}
                                 required
-                            />
+                            >
+                                <option value="" disabled>Seleccionar</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                                <option value="otro">Otro</option>
+                            </select>
+
+                            {/* Campo adicional que aparece cuando se selecciona "Otro" */}
+                            {(formData.genero !== 'Hombre' && formData.genero !== 'Mujer') && (
+                                <input
+                                    className={`${styles.inputBox} ${styles.smallBox}`}
+                                    type="text"
+                                    id="otro-genero"
+                                    placeholder="Especificar género"
+                                    value={otroGenero}
+                                    onChange={handleOtroGeneroChange}
+                                    style={{ marginTop: '0.5rem' }}
+                                    required
+                                />
+                            )}
                         </div>
                     </div>
 
-                    <button type="submit" className={styles.buttonMark}>
-                        Registrarme
+                    <button
+                        type="submit"
+                        className={styles.buttonMark}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Registrando...' : 'Registrarme'}
                     </button>
                 </form>
             </div>

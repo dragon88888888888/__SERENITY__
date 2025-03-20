@@ -27,14 +27,7 @@ export default async function handler(req, res) {
         // Extraer el contenido base64 (eliminar el prefijo "data:audio/webm;base64,")
         const base64Content = audioData.split(',')[1];
 
-        // Nota: Como estamos en un entorno serverless, no podemos guardar archivos
-        // temporales, así que vamos a usar un enfoque diferente.
-        // Vamos a crear un objeto simple para la transcripción
-
-        // Usando generativeContent con un enfoque más simple
         const prompt = "Por favor transcribe el siguiente audio. Si está en español, mantén la transcripción en español.";
-
-        // Enfoque alternativo según la documentación
         const result = await model.generateContent({
             contents: [
                 {

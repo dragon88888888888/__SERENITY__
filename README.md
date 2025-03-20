@@ -1,3 +1,18 @@
+# __SERENITY__
+
+**Proyecto en Desarrollo** 🚧
+
+Este proyecto se encuentra actualmente en fase de desarrollo activo. Se están añadiendo funcionalidades y realizando mejoras constantemente.
+
+Puedes seguir el progreso del proyecto en: 
+(https://serenity-eosin-two.vercel.app/) 
+![https://serenity-eosin-two.vercel.app/](image.png)
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started

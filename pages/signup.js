@@ -50,6 +50,7 @@ export default function Signup() {
         }
     };
 
+    // Modificación en el handleSubmit de Signup.js
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -68,8 +69,19 @@ export default function Signup() {
             const data = await response.json();
 
             if (response.ok) {
-                // Registro exitoso, redirigir a la página de inicio de sesión
-                router.push('/login');
+                // Guardar el nombre de usuario y el token en localStorage
+                localStorage.setItem('username', formData.usuario);
+
+                // Guardar el token que ahora devuelve la API de registro
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    console.log('Token guardado:', data.token); // Para depuración
+                } else {
+                    console.warn('No se recibió token del servidor');
+                }
+
+                // Registro exitoso, redirigir a la página de test
+                router.push('/test_full');
             } else {
                 // Mostrar mensaje de error
                 setError(data.message || 'Error al registrar usuario');

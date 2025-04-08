@@ -4,6 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faPlay, faPause, faVolumeMute, faTrash, faRobot, faUser } from '@fortawesome/free-solid-svg-icons';
 import WaveSurfer from 'wavesurfer.js';
 import styles from '../styles/Chat.module.css';
+import { useRouter } from 'next/router';
+// Dentro del componente Chat, añade:
+
 
 export default function Chat() {
     const [messages, setMessages] = useState([]);
@@ -18,9 +21,21 @@ export default function Chat() {
     const audioChunksRef = useRef([]);
     const wavesurferRefs = useRef({});
     const messageEndRef = useRef(null);
+    const router = useRouter();
+
+    // Verificar la autenticación al cargar el componente
+    useEffect(() => {
+        // Verificar si hay un token en localStorage
+        const token = localStorage.getItem('authToken');
+        const username = localStorage.getItem('username');
+
+        if (!token || !username) {
+            alert('No hay una sesión activa. Por favor, inicia sesión.');
+            router.push('/login');
+        }
+    }, [router]);
 
 
-    
     // Cargar mensajes al iniciar
     useEffect(() => {
         // Scroll hacia abajo cuando se añaden mensajes
@@ -126,12 +141,17 @@ export default function Chat() {
         // Resetear estado
         setPlayingAudio(null);
     };
-
-    // Función para procesar el audio grabado
+    // Modifica la función processRecordedAudio para incluir el token en la solicitud
     const processRecordedAudio = async (audioBlob) => {
         setIsLoading(true);
 
         try {
+            // Obtener el token de autenticación del localStorage
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No hay sesión activa. Por favor, inicia sesión nuevamente.');
+            }
+
             // Convertir el blob a base64
             const base64Audio = await blobToBase64(audioBlob);
 
@@ -140,6 +160,7 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Añadir token de autorización
                 },
                 body: JSON.stringify({
                     audioData: base64Audio,
@@ -175,6 +196,7 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Añadir token de autorización
                 },
                 body: JSON.stringify({
                     message: transcript,
@@ -183,7 +205,7 @@ export default function Chat() {
             });
 
             if (!chatResponse.ok) {
-                throw new Error('Error en la respuesta del chat');
+                throw new Error(`Error en la respuesta del chat: ${chatResponse.status} ${chatResponse.statusText}`);
             }
 
             const { response, updatedHistory } = await chatResponse.json();
@@ -194,6 +216,7 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Añadir token de autorización
                 },
                 body: JSON.stringify({
                     text: response,
@@ -233,7 +256,7 @@ export default function Chat() {
 
         } catch (error) {
             console.error('Error procesando el audio:', error);
-            alert('Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.');
+            alert(`Ocurrió un error al procesar tu mensaje: ${error.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -366,7 +389,7 @@ export default function Chat() {
             }
         });
 
-        
+
 
     }, [messages]);
 

@@ -1,0 +1,292 @@
+/* TestFull.module.css */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 8px 8px 0 #000;
+    border: 3px solid #000;
+}
+
+.title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-bottom: 3px solid #000;
+    padding-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.6rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid #000;
+    padding-left: 1rem;
+}
+
+.instructions {
+    background-color: #f8f8f8;
+    padding: 1rem;
+    border-radius: 5px;
+    border-left: 5px solid #333;
+    margin-bottom: 1.5rem;
+}
+
+.questionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    border: 2px solid #000;
+}
+
+.questionTable th {
+    background-color: #f0f0f0;
+    padding: 0.8rem;
+    text-align: center;
+    border: 2px solid #000;
+}
+
+.questionTable td {
+    padding: 0.8rem;
+    border: 1px solid #000;
+    vertical-align: middle;
+}
+
+.questionTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.radioOption {
+    margin: 0.3rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.radioOption input[type="radio"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.radioLabel {
+    margin-left: 0.5rem;
+    font-size: 1rem;
+}
+
+.resultContainer {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+    border: 3px solid #000;
+    box-shadow: 5px 5px 0 #000;
+}
+
+.resultSection {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.anxietyResult {
+    border-left: 8px solid #74b9ff;
+    background-color: rgba(116, 185, 255, 0.1);
+}
+
+.depressionResult {
+    border-left: 8px solid #55efc4;
+    background-color: rgba(85, 239, 196, 0.1);
+}
+
+.extraResult {
+    border-left: 8px solid #a29bfe;
+    background-color: rgba(162, 155, 254, 0.1);
+}
+
+.warning {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 2px solid #ff7675;
+    background-color: rgba(255, 118, 117, 0.1);
+    font-weight: bold;
+    color: #d63031;
+}
+
+.loadingState {
+    text-align: center;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+}
+
+.error {
+    color: #d63031;
+    background-color: #ffeded;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    border-left: 5px solid #d63031;
+}
+
+.extraQuestion {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    border: 2px solid #ddd;
+}
+
+.extraQuestion p {
+    margin-bottom: 1rem;
+}
+
+.infoBox {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #e2f0ff;
+    border-radius: 5px;
+    border-left: 5px solid #3498db;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        margin: 0 1rem;
+    }
+
+    .questionTable {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 1.4rem;
+    }
+}
+
+/* Añadir estos estilos a tu TestFull.module.css */
+
+.radioOption {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.radioOption input[type="radio"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.radioLabel {
+    margin-left: 0.5rem;
+    cursor: pointer;
+}
+
+/* Estilos mejorados para la tabla */
+.questionTable td {
+    text-align: center;
+}
+
+.questionTable input[type="radio"] {
+    margin: 0 auto;
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+/* Mejorar la visualización en dispositivos móviles */
+@media (max-width: 768px) {
+    .radioOption {
+        margin: 0.8rem 0;
+    }
+
+    .radioOption input[type="radio"] {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Estilos específicos para los radio buttons de la sección de depresión */
+.radioInput {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    vertical-align: top;
+    /* Hacer que el botón sea más clicable */
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.radioLabel {
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    width: calc(100% - 30px);
+}
+
+.radioOption {
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 0;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Agregar un efecto hover para mejor feedback visual */
+.radioOption:hover {
+    background-color: #f0f0f0;
+}
+
+/* Estilos para el grupo de radio buttons */
+.radioGroup {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+}
+
+.radioGroupHeader {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* Estilo específico para radio buttons seleccionados */
+.radioOption input[type="radio"]:checked+.radioLabel {
+    font-weight: bold;
+}
+
+/* Mejora para dispositivos táctiles */
+@media (max-width: 768px) {
+    .radioOption {
+        padding: 8px 5px;
+    }
+
+    .radioInput {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+    }
+}

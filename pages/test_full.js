@@ -481,7 +481,7 @@ const TestFull = () => {
                   ? 'Podría haber otros factores o condiciones que merecen atención adicional. Considera una evaluación más específica.'
                   : 'No se detectan indicadores significativos de otros trastornos relacionados.'
               }</p>
-              <p>Las respuestas "Frecuentemente" o "Siempre" en múltiples preguntas de esta sección pueden indicar la presencia de otros trastornos que podrían confundirse con ansiedad o depresión.</p>
+              <p>Las respuestas &quot;Frecuentemente&quot; o &quout;Siempre&quout; en múltiples preguntas de esta sección pueden indicar la presencia de otros trastornos que podrían confundirse con ansiedad o depresión.</p>
             </div>
 
             <div className={styles.warning}>

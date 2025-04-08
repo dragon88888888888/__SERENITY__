@@ -155,95 +155,72 @@ const TestFull = () => {
     },
   ];
 
-  const depressionGroups = [
-    // Ítem 1
-    [
-      ["Esta tristeza me produce verdaderos sufrimientos.", 2],
-      ["No me encuentro triste.", 0],
-      ["Me siento algo triste y deprimido.", 1],
-      ["Ya no puedo soportar esta pena.", 3],
-      ["Tengo siempre como una pena enésima que no me la puedo quitar.", 2]
-    ],
-    // Ítem 2
-    [
-      ["Soy optimista sobre lo que puede venir", 0],
-      ["No soy especialmente pesimista, ni creo que las cosas me vayan a ir mal", 1],
-      ["Creo que podrían sugerir desafíos, pero confío en superarlos.", 1],
-      ["No espero nada bueno de la vida.", 2],
-      ["No espero nada. Esto no tiene remedio.", 3]
-    ],
-    // Ítem 3
-    [
-      ["Estoy satisfecho con mis logros y me siento bien conmigo mismo.", 0],
-      ["No me considero fracasado.", 1],
-      ["He tenido más fracasos que la mayoría de la gente.", 2],
-      ["Siento que he hecho pocas cosas que valgan la pena.", 2],
-      ["Veo mi vida llena de fracasos.", 3]
-    ],
-    // Ítem 4
-    [
-      ["Disfruto de las cosas que hago y me siento pleno.", 0],
-      ["No estoy especialmente insatisfecho.", 1],
-      ["Me encuentro insatisfecho conmigo mismo.", 1],
-      ["A veces siento que podría disfrutar más las cosas, pero estoy trabajando en ello.", 0],
-      ["Estoy harto de todo.", 3]
-    ],
-    // Ítem 5
-    [
-      ["A veces me siento despreciable y mala persona.", 1],
-      ["Me siento bastante culpable.", 2],
-      ["Me siento prácticamente todo el tiempo mala persona y despreciable.", 2],
-      ["Me siento muy infame (perverso, canalla) y despreciable.", 3],
-      ["No me siento culpable.", 0]
-    ],
-    // Ítem 6
-    [
-      ["Creo que merezco cosas buenas y confío en que sucederá.", 0],
-      ["No pienso que merezco ser castigado.", 1],
-      ["Aunque he cometido errores, sé que puedo aprender y mejorar.", 1],
-      ["Siento que todo lo que me pasa es mi culpa.", 2],
-      ["Siento que me están castigando o me castigarán.", 3]
-    ],
-    // Ítem 7
-    [
-      ["Me siento motivado y sigo estudiando como siempre.", 0],
-      ["Me cuesta concentrarme, pero sigo intentando estudiar.", 1],
-      ["Me resulta muy difícil estudiar o concentrarme en tareas.", 2],
-      ["No tengo ganas de estudiar ni de hacer tareas.", 3],
-      ["Siento que estudiar ya no tiene sentido.", 2]
-    ],
-    // Ítem 8
-    [
-      ["Me siento capaz de cumplir con mis tareas escolares sin mayores dificultades.", 0],
-      ["A veces dudo de mi capacidad, pero aun así sigo intentándolo y trato de mejorar.", 1],
-      ["Siento que no soy lo suficientemente bueno en mis estudios.", 2],
-      ["Estoy convencido de que no puedo hacer nada bien en la escuela.", 3],
-      ["Siento que no puedo mejorar, sin importar lo que haga.", 2]
-    ],
-    // Ítem 9
-    [
-      ["Evito completamente a los demás en el entorno escolar.", 3],
-      ["A veces prefiero evitar interactuar con otros en la escuela.", 1],
-      ["Me llevo bien con mis compañeros y profesores como siempre.", 0],
-      ["Me siento aislado o incomprendido por mis compañeros y profesores.", 2],
-      ["Me siento como si nadie me entendiera en la escuela.", 2]
-    ],
-    // Ítem 10
-    [
-      ["A veces pierdo interés en algunas actividades escolares.", 1],
-      ["Ya no me interesa mucho lo que sucede en la escuela.", 2],
-      ["No tengo interés en participar en nada relacionado con la escuela.", 3],
-      ["Las actividades escolares ya no me parecen importantes.", 3],
-      ["Me interesan las actividades escolares como siempre.", 0]
-    ],
-    // Ítem 11
-    [
-      ["Me siento tranquilo respecto a mi desempeño académico.", 0],
-      ["A veces me siento algo presionado, pero lo manejo.", 1],
-      ["Siento que la presión académica me está afectando bastante.", 2],
-      ["Estoy completamente abrumado y no puedo manejar la presión escolar.", 3],
-      ["La presión me hace sentir incapaz de seguir adelante.", 3]
-    ]
+  const depressionItems = [
+    ["Esta tristeza me produce verdaderos sufrimientos.", 2],
+    ["No me encuentro triste.", 0],
+    ["Me siento algo triste y deprimido.", 1],
+    ["Ya no puedo soportar esta pena.", 3],
+    ["Tengo siempre como una pena enésima que no me la puedo quitar.", 2],
+
+    ["Soy optimista sobre lo que puede venir", 0],
+    ["No soy especialmente pesimista, ni creo que las cosas me vayan a ir mal", 1],
+    ["Creo que podrían sugerir desafíos, pero confío en superarlos.", 1],
+    ["No espero nada bueno de la vida.", 2],
+    ["No espero nada. Esto no tiene remedio.", 3],
+
+    ["Estoy satisfecho con mis logros y me siento bien conmigo mismo.", 0],
+    ["No me considero fracasado.", 1],
+    ["He tenido más fracasos que la mayoría de la gente.", 2],
+    ["Siento que he hecho pocas cosas que valgan la pena.", 2],
+    ["Veo mi vida llena de fracasos.", 3],
+
+    ["Disfruto de las cosas que hago y me siento pleno.", 0],
+    ["No estoy especialmente insatisfecho.", 1],
+    ["Me encuentro insatisfecho conmigo mismo.", 1],
+    ["A veces siento que podría disfrutar más las cosas, pero estoy trabajando en ello.", 0],
+    ["Estoy harto de todo.", 3],
+
+    ["A veces me siento despreciable y mala persona.", 1],
+    ["Me siento bastante culpable.", 2],
+    ["Me siento prácticamente todo el tiempo mala persona y despreciable.", 2],
+    ["Me siento muy infame (perverso, canalla) y despreciable.", 3],
+    ["No me siento culpable.", 0],
+
+    ["Creo que merezco cosas buenas y confío en que sucederá.", 0],
+    ["No pienso que merezco ser castigado.", 1],
+    ["Aunque he cometido errores, sé que puedo aprender y mejorar.", 1],
+    ["Siento que todo lo que me pasa es mi culpa.", 2],
+    ["Siento que me están castigando o me castigarán.", 3],
+
+    ["Me siento motivado y sigo estudiando como siempre.", 0],
+    ["Me cuesta concentrarme, pero sigo intentando estudiar.", 1],
+    ["Me resulta muy difícil estudiar o concentrarme en tareas.", 2],
+    ["No tengo ganas de estudiar ni de hacer tareas.", 3],
+    ["Siento que estudiar ya no tiene sentido.", 2],
+
+    ["Me siento capaz de cumplir con mis tareas escolares sin mayores dificultades.", 0],
+    ["A veces dudo de mi capacidad, pero aun así sigo intentándolo y trato de mejorar.", 1],
+    ["Siento que no soy lo suficientemente bueno en mis estudios.", 2],
+    ["Estoy convencido de que no puedo hacer nada bien en la escuela.", 3],
+    ["Siento que no puedo mejorar, sin importar lo que haga.", 2],
+
+    ["Evito completamente a los demás en el entorno escolar.", 3],
+    ["A veces prefiero evitar interactuar con otros en la escuela.", 1],
+    ["Me llevo bien con mis compañeros y profesores como siempre.", 0],
+    ["Me siento aislado o incomprendido por mis compañeros y profesores.", 2],
+    ["Me siento como si nadie me entendiera en la escuela.", 2],
+
+    ["A veces pierdo interés en algunas actividades escolares.", 1],
+    ["Ya no me interesa mucho lo que sucede en la escuela.", 2],
+    ["No tengo interés en participar en nada relacionado con la escuela.", 3],
+    ["Las actividades escolares ya no me parecen importantes.", 3],
+    ["Me interesan las actividades escolares como siempre.", 0],
+
+    ["Me siento tranquilo respecto a mi desempeño académico.", 0],
+    ["A veces me siento algo presionado, pero lo manejo.", 1],
+    ["Siento que la presión académica me está afectando bastante.", 2],
+    ["Estoy completamente abrumado y no puedo manejar la presión escolar.", 3],
+    ["La presión me hace sentir incapaz de seguir adelante.", 3],
   ];
 
   return (
@@ -305,33 +282,77 @@ const TestFull = () => {
         <p className={styles.instructions}><strong>Instrucciones:</strong> Lee cada apartado con calma, marca la respuesta que mejor refleje cómo te has sentido durante la última semana.</p>
         <p className={styles.instructions}><strong>Importante:</strong> Cada frase por ítem tendrá un número específico que deberán sumar para obtener el resultado obtenido.</p>
 
-        {depressionGroups.map((group, groupIndex) => (
-          <div key={`dep_group_${groupIndex}`} className={styles.radioGroup}>
-            <div className={styles.radioGroupHeader}><strong>Ítem {groupIndex + 1}:</strong></div>
+        {[...Array(11)].map((_, i) => {
+          // Obtener las opciones para este ítem
+          const itemOptions = depressionItems.slice(i * 5, (i + 1) * 5);
 
-            {group.map((option, optionIndex) => {
-              const uniqueId = `dep_${groupIndex}_opt_${optionIndex}`;
-              const [text, value] = option;
+          return (
+            <div key={`depGroup_${i}`} className={styles.radioGroup}>
+              <div className={styles.radioGroupHeader}><strong>Ítem {i + 1}:</strong></div>
 
-              return (
-                <div key={uniqueId} className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    id={uniqueId}
-                    name={`dep_${groupIndex}`}
-                    value={value}
-                    checked={depressionAnswers[`dep_${groupIndex}`] === value}
-                    onChange={handleDepressionChange}
-                    className={styles.radioInput}
-                  />
-                  <label htmlFor={uniqueId} className={styles.radioLabel}>
-                    {text} ({value})
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+              {/* Renderizar cada opción individual directamente, sin map */}
+              <div className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`dep_${i}_0`}
+                  name={`dep_${i}`}
+                  value={itemOptions[0][1]}
+                  checked={depressionAnswers[`dep_${i}`] === itemOptions[0][1]}
+                  onChange={handleDepressionChange}
+                />
+                <label htmlFor={`dep_${i}_0`}>{itemOptions[0][0]} ({itemOptions[0][1]})</label>
+              </div>
+
+              <div className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`dep_${i}_1`}
+                  name={`dep_${i}`}
+                  value={itemOptions[1][1]}
+                  checked={depressionAnswers[`dep_${i}`] === itemOptions[1][1]}
+                  onChange={handleDepressionChange}
+                />
+                <label htmlFor={`dep_${i}_1`}>{itemOptions[1][0]} ({itemOptions[1][1]})</label>
+              </div>
+
+              <div className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`dep_${i}_2`}
+                  name={`dep_${i}`}
+                  value={itemOptions[2][1]}
+                  checked={depressionAnswers[`dep_${i}`] === itemOptions[2][1]}
+                  onChange={handleDepressionChange}
+                />
+                <label htmlFor={`dep_${i}_2`}>{itemOptions[2][0]} ({itemOptions[2][1]})</label>
+              </div>
+
+              <div className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`dep_${i}_3`}
+                  name={`dep_${i}`}
+                  value={itemOptions[3][1]}
+                  checked={depressionAnswers[`dep_${i}`] === itemOptions[3][1]}
+                  onChange={handleDepressionChange}
+                />
+                <label htmlFor={`dep_${i}_3`}>{itemOptions[3][0]} ({itemOptions[3][1]})</label>
+              </div>
+
+              <div className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`dep_${i}_4`}
+                  name={`dep_${i}`}
+                  value={itemOptions[4][1]}
+                  checked={depressionAnswers[`dep_${i}`] === itemOptions[4][1]}
+                  onChange={handleDepressionChange}
+                />
+                <label htmlFor={`dep_${i}_4`}>{itemOptions[4][0]} ({itemOptions[4][1]})</label>
+              </div>
+            </div>
+          );
+        })}
 
         <h2 className={styles.subtitle}>Autoevaluación Emocional (Parte 3)</h2>
         <p className={styles.instructions}>

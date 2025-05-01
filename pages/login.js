@@ -47,7 +47,7 @@ export default function Login() {
             if (response.ok) {
                 // Guardar token e información del usuario
                 localStorage.setItem('authToken', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('username', JSON.stringify(data.username));
 
                 // Redireccionar a la página principal
                 router.push('/main');

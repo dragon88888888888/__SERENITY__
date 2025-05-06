@@ -1,4 +1,30 @@
-import * as sdk from "microsoft-cognitiveservices-speech-sdk";
+import { ElevenLabsClient } from "elevenlabs";
+import { Readable } from 'stream';
+
+// Función auxiliar para convertir un ReadableStream a Buffer
+async function streamToBuffer(stream) {
+    const chunks = [];
+    
+    // Si es un Readable de Node.js
+    if (stream instanceof Readable) {
+        return new Promise((resolve, reject) => {
+            stream.on('data', (chunk) => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', () => resolve(Buffer.concat(chunks)));
+        });
+    }
+    
+    // Si es un ReadableStream web
+    const reader = stream.getReader();
+    
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+    }
+    
+    return Buffer.concat(chunks);
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -12,50 +38,30 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: 'Text is required' });
         }
 
-        // Configurar el servicio de voz de Azure
-        const speechConfig = sdk.SpeechConfig.fromSubscription(
-            process.env.AZURE_SPEECH_KEY,
-            process.env.AZURE_SPEECH_REGION
-        );
-
-        // Configurar voz en español
-        speechConfig.speechSynthesisVoiceName = "es-ES-ElviraNeural";
-
-        // Usar síntesis de voz a un archivo de audio en memoria
-        // En lugar de streams, usaremos el resultado como un ArrayBuffer
-        const synthesizer = new sdk.SpeechSynthesizer(speechConfig);
-
-        // Realizar la síntesis y obtener el resultado como AudioDataStream
-        const result = await new Promise((resolve, reject) => {
-            synthesizer.speakTextAsync(
-                text,
-                result => {
-                    synthesizer.close();
-                    resolve(result);
-                },
-                error => {
-                    synthesizer.close();
-                    reject(error);
-                }
-            );
+        // Configurar el cliente de ElevenLabs
+        const elevenlabs = new ElevenLabsClient({
+            apiKey: process.env.ELEVENLABS_API_KEY,
         });
 
-        // Verificar si la síntesis fue exitosa
-        if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
-            // Obtener los datos de audio como un ArrayBuffer
-            const audioData = result.audioData;
+        // Realizar la síntesis de voz con ElevenLabs
+        // Usamos el método textToSpeech.convert para obtener el audio
+        const audioStream = await elevenlabs.textToSpeech.convert(
+            process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL", // ID de voz en español
+            {
+                text: text,
+                model_id: "eleven_multilingual_v2", // Modelo multilingüe para soporte en español
+                output_format: "mp3_44100_128", // Formato de alta calidad similar a Azure
+            }
+        );
+        
+        // Convertir el stream a buffer
+        const audioBuffer = await streamToBuffer(audioStream);
 
-            // Convertir el ArrayBuffer a Base64 para enviarlo al cliente
-            const base64Audio = Buffer.from(audioData).toString('base64');
-            const audioDataUrl = `data:audio/wav;base64,${base64Audio}`;
+        // Convertir el buffer a base64
+        const base64Audio = audioBuffer.toString('base64');
+        const audioDataUrl = `data:audio/mp3;base64,${base64Audio}`;
 
-            return res.status(200).json({ audioData: audioDataUrl });
-        } else {
-            return res.status(400).json({
-                message: 'Error en la síntesis de voz',
-                details: result.errorDetails || 'Razón desconocida'
-            });
-        }
+        return res.status(200).json({ audioData: audioDataUrl });
 
     } catch (error) {
         console.error('Error en la síntesis de voz:', error);

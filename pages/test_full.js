@@ -1,4 +1,5 @@
-// pages/test_full.js
+// Reemplaza todo el código de TestFull.js con esta versión
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/TestFull.module.css';
@@ -8,41 +9,94 @@ const TestFull = () => {
   const [form, setForm] = useState({
     usuario: ''
   });
+  
+  // Parte 1: Ansiedad
   const [answers, setAnswers] = useState({});
   const [totalScore, setTotalScore] = useState(null);
   const [interpretacion, setInterpretacion] = useState('');
-  const [depressionAnswers, setDepressionAnswers] = useState({});
+  
+  // Parte 2: Depresión - NUEVA IMPLEMENTACIÓN
+  // En lugar de guardar los valores, guardamos qué opción está seleccionada (0-4)
+  const [selectedOptions, setSelectedOptions] = useState({
+    item0: null, item1: null, item2: null, item3: null, item4: null,
+    item5: null, item6: null, item7: null, item8: null, item9: null, item10: null
+  });
   const [depressionScore, setDepressionScore] = useState(null);
+  
+  // Parte 3: Diferencial
   const [extraAnswers, setExtraAnswers] = useState({});
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Obtener automáticamente el usuario del localStorage al cargar el componente
+  // Obtener automáticamente el usuario del localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('username');
     if (savedUser) {
       setForm(prev => ({ ...prev, usuario: savedUser }));
     } else {
-      // Si no hay usuario en localStorage, redirigir al registro
-      router.push('/signup');
-    }
+      //     // Si no hay usuario en localStorage, redirigir al registro
+        router.push('/signup');
+      }
+    // No redireccionamos para pruebas
   }, [router]);
 
+  // Manejo de cambios en Parte 1: Ansiedad
   const handleRadioChange = (e) => {
     const { name, value } = e.target;
     setAnswers({ ...answers, [name]: parseInt(value) });
   };
 
-  const handleDepressionChange = (e) => {
+  // Manejo de cambios en Parte 3: Diferencial
+  const handleExtraChange = (e) => {
     const { name, value } = e.target;
-    setDepressionAnswers({ ...depressionAnswers, [name]: parseInt(value) });
+    setExtraAnswers({ ...extraAnswers, [name]: parseInt(value) });
+  };
+
+  // Manejar selección en Parte 2: Depresión
+  const handleDepressionSelection = (itemIndex, optionIndex) => {
+    setSelectedOptions({
+      ...selectedOptions,
+      [`item${itemIndex}`]: optionIndex
+    });
+  };
+
+  // Función para calcular el puntaje de depresión
+  const calculateDepressionScore = () => {
+    // Definimos los valores por opción para cada ítem
+    const itemValues = [
+      [2, 0, 1, 3, 2], // Ítem 1
+      [0, 1, 1, 2, 3], // Ítem 2
+      [0, 1, 2, 2, 3], // Ítem 3
+      [0, 1, 1, 0, 3], // Ítem 4
+      [1, 2, 2, 3, 0], // Ítem 5
+      [0, 1, 1, 2, 3], // Ítem 6
+      [0, 1, 2, 3, 2], // Ítem 7
+      [0, 1, 2, 3, 2], // Ítem 8
+      [3, 1, 0, 2, 2], // Ítem 9
+      [1, 2, 3, 3, 0], // Ítem 10
+      [0, 1, 2, 3, 3]  // Ítem 11
+    ];
+
+    let total = 0;
+    
+    // Para cada ítem, si hay una selección, sumamos el valor correspondiente
+    for (let i = 0; i < 11; i++) {
+      const selectedOption = selectedOptions[`item${i}`];
+      if (selectedOption !== null) {
+        total += itemValues[i][selectedOption];
+      }
+    }
+    
+    return total;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    // Procesar puntaje de ansiedad
+    
+    // Calcular puntaje de ansiedad
     const total = Object.values(answers).reduce((acc, val) => acc + val, 0);
     setTotalScore(total);
 
@@ -59,8 +113,8 @@ const TestFull = () => {
     }
     setInterpretacion(mensajeAnsiedad);
 
-    // Procesar puntaje de depresión
-    const depTotal = Object.values(depressionAnswers).reduce((acc, val) => acc + val, 0);
+    // Calcular puntaje de depresión usando la nueva función
+    const depTotal = calculateDepressionScore();
     setDepressionScore(depTotal);
 
     // Interpretación depresión
@@ -91,7 +145,7 @@ const TestFull = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Asegurar que el formato sea "Bearer [token]"
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           usuario: form.usuario,
@@ -118,16 +172,88 @@ const TestFull = () => {
     }
   };
 
-  // Contar respuestas de la tercera parte (Diferenciación)
-  const countExtraAnswers = Object.values(extraAnswers).reduce((acc, val) => {
-    // Para simplificar, contemos cuántas respuestas frecuentes/siempre hay
-    if (val >= 3) { // "Frecuentemente" o "Siempre"
-      return acc + 1;
-    }
-    return acc;
-  }, 0);
+  // Opciones de texto para la parte de depresión
+  const depressionOptions = [
+    [
+      "Esta tristeza me produce verdaderos sufrimientos. (2)",
+      "No me encuentro triste. (0)",
+      "Me siento algo triste y deprimido. (1)",
+      "Ya no puedo soportar esta pena. (3)",
+      "Tengo siempre como una pena enésima que no me la puedo quitar. (2)"
+    ],
+    [
+      "Soy optimista sobre lo que puede venir (0)",
+      "No soy especialmente pesimista, ni creo que las cosas me vayan a ir mal (1)",
+      "Creo que podrían sugerir desafíos, pero confío en superarlos. (1)",
+      "No espero nada bueno de la vida. (2)",
+      "No espero nada. Esto no tiene remedio. (3)"
+    ],
+    [
+      "Estoy satisfecho con mis logros y me siento bien conmigo mismo. (0)",
+      "No me considero fracasado. (1)",
+      "He tenido más fracasos que la mayoría de la gente. (2)",
+      "Siento que he hecho pocas cosas que valgan la pena. (2)",
+      "Veo mi vida llena de fracasos. (3)"
+    ],
+    [
+      "Disfruto de las cosas que hago y me siento pleno. (0)",
+      "No estoy especialmente insatisfecho. (1)",
+      "Me encuentro insatisfecho conmigo mismo. (1)",
+      "A veces siento que podría disfrutar más las cosas, pero estoy trabajando en ello. (0)",
+      "Estoy harto de todo. (3)"
+    ],
+    [
+      "A veces me siento despreciable y mala persona. (1)",
+      "Me siento bastante culpable. (2)",
+      "Me siento prácticamente todo el tiempo mala persona y despreciable. (2)",
+      "Me siento muy infame (perverso, canalla) y despreciable. (3)",
+      "No me siento culpable. (0)"
+    ],
+    [
+      "Creo que merezco cosas buenas y confío en que sucederá. (0)",
+      "No pienso que merezco ser castigado. (1)",
+      "Aunque he cometido errores, sé que puedo aprender y mejorar. (1)",
+      "Siento que todo lo que me pasa es mi culpa. (2)",
+      "Siento que me están castigando o me castigarán. (3)"
+    ],
+    [
+      "Me siento motivado y sigo estudiando como siempre. (0)",
+      "Me cuesta concentrarme, pero sigo intentando estudiar. (1)",
+      "Me resulta muy difícil estudiar o concentrarme en tareas. (2)",
+      "No tengo ganas de estudiar ni de hacer tareas. (3)",
+      "Siento que estudiar ya no tiene sentido. (2)"
+    ],
+    [
+      "Me siento capaz de cumplir con mis tareas escolares sin mayores dificultades. (0)",
+      "A veces dudo de mi capacidad, pero aun así sigo intentándolo y trato de mejorar. (1)",
+      "Siento que no soy lo suficientemente bueno en mis estudios. (2)",
+      "Estoy convencido de que no puedo hacer nada bien en la escuela. (3)",
+      "Siento que no puedo mejorar, sin importar lo que haga. (2)"
+    ],
+    [
+      "Evito completamente a los demás en el entorno escolar. (3)",
+      "A veces prefiero evitar interactuar con otros en la escuela. (1)",
+      "Me llevo bien con mis compañeros y profesores como siempre. (0)",
+      "Me siento aislado o incomprendido por mis compañeros y profesores. (2)",
+      "Me siento como si nadie me entendiera en la escuela. (2)"
+    ],
+    [
+      "A veces pierdo interés en algunas actividades escolares. (1)",
+      "Ya no me interesa mucho lo que sucede en la escuela. (2)",
+      "No tengo interés en participar en nada relacionado con la escuela. (3)",
+      "Las actividades escolares ya no me parecen importantes. (3)",
+      "Me interesan las actividades escolares como siempre. (0)"
+    ],
+    [
+      "Me siento tranquilo respecto a mi desempeño académico. (0)",
+      "A veces me siento algo presionado, pero lo manejo. (1)",
+      "Siento que la presión académica me está afectando bastante. (2)",
+      "Estoy completamente abrumado y no puedo manejar la presión escolar. (3)",
+      "La presión me hace sentir incapaz de seguir adelante. (3)"
+    ]
+  ];
 
-
+  // Preguntas para la Parte 1: Ansiedad
   const questions = [
     {
       name: 'estado_animo',
@@ -155,77 +281,57 @@ const TestFull = () => {
     },
   ];
 
-  const depressionItems = [
-    ["Esta tristeza me produce verdaderos sufrimientos.", 2],
-    ["No me encuentro triste.", 0],
-    ["Me siento algo triste y deprimido.", 1],
-    ["Ya no puedo soportar esta pena.", 3],
-    ["Tengo siempre como una pena enésima que no me la puedo quitar.", 2],
-
-    ["Soy optimista sobre lo que puede venir", 0],
-    ["No soy especialmente pesimista, ni creo que las cosas me vayan a ir mal", 1],
-    ["Creo que podrían sugerir desafíos, pero confío en superarlos.", 1],
-    ["No espero nada bueno de la vida.", 2],
-    ["No espero nada. Esto no tiene remedio.", 3],
-
-    ["Estoy satisfecho con mis logros y me siento bien conmigo mismo.", 0],
-    ["No me considero fracasado.", 1],
-    ["He tenido más fracasos que la mayoría de la gente.", 2],
-    ["Siento que he hecho pocas cosas que valgan la pena.", 2],
-    ["Veo mi vida llena de fracasos.", 3],
-
-    ["Disfruto de las cosas que hago y me siento pleno.", 0],
-    ["No estoy especialmente insatisfecho.", 1],
-    ["Me encuentro insatisfecho conmigo mismo.", 1],
-    ["A veces siento que podría disfrutar más las cosas, pero estoy trabajando en ello.", 0],
-    ["Estoy harto de todo.", 3],
-
-    ["A veces me siento despreciable y mala persona.", 1],
-    ["Me siento bastante culpable.", 2],
-    ["Me siento prácticamente todo el tiempo mala persona y despreciable.", 2],
-    ["Me siento muy infame (perverso, canalla) y despreciable.", 3],
-    ["No me siento culpable.", 0],
-
-    ["Creo que merezco cosas buenas y confío en que sucederá.", 0],
-    ["No pienso que merezco ser castigado.", 1],
-    ["Aunque he cometido errores, sé que puedo aprender y mejorar.", 1],
-    ["Siento que todo lo que me pasa es mi culpa.", 2],
-    ["Siento que me están castigando o me castigarán.", 3],
-
-    ["Me siento motivado y sigo estudiando como siempre.", 0],
-    ["Me cuesta concentrarme, pero sigo intentando estudiar.", 1],
-    ["Me resulta muy difícil estudiar o concentrarme en tareas.", 2],
-    ["No tengo ganas de estudiar ni de hacer tareas.", 3],
-    ["Siento que estudiar ya no tiene sentido.", 2],
-
-    ["Me siento capaz de cumplir con mis tareas escolares sin mayores dificultades.", 0],
-    ["A veces dudo de mi capacidad, pero aun así sigo intentándolo y trato de mejorar.", 1],
-    ["Siento que no soy lo suficientemente bueno en mis estudios.", 2],
-    ["Estoy convencido de que no puedo hacer nada bien en la escuela.", 3],
-    ["Siento que no puedo mejorar, sin importar lo que haga.", 2],
-
-    ["Evito completamente a los demás en el entorno escolar.", 3],
-    ["A veces prefiero evitar interactuar con otros en la escuela.", 1],
-    ["Me llevo bien con mis compañeros y profesores como siempre.", 0],
-    ["Me siento aislado o incomprendido por mis compañeros y profesores.", 2],
-    ["Me siento como si nadie me entendiera en la escuela.", 2],
-
-    ["A veces pierdo interés en algunas actividades escolares.", 1],
-    ["Ya no me interesa mucho lo que sucede en la escuela.", 2],
-    ["No tengo interés en participar en nada relacionado con la escuela.", 3],
-    ["Las actividades escolares ya no me parecen importantes.", 3],
-    ["Me interesan las actividades escolares como siempre.", 0],
-
-    ["Me siento tranquilo respecto a mi desempeño académico.", 0],
-    ["A veces me siento algo presionado, pero lo manejo.", 1],
-    ["Siento que la presión académica me está afectando bastante.", 2],
-    ["Estoy completamente abrumado y no puedo manejar la presión escolar.", 3],
-    ["La presión me hace sentir incapaz de seguir adelante.", 3],
+  // Preguntas diferenciales para Parte 3
+  const differentialQuestions = [
+    {
+      question: "Diferenciando la Ansiedad de la Depresión mayor: ¿Con qué frecuencia te sientes preocupado o nervioso por el futuro, en comparación con sentirte triste, sin esperanza o sin interés en las cosas que solías disfrutar?",
+      info: "La ansiedad se enfoca en preocupaciones y temor al futuro, mientras que la depresión está más relacionada con sentimientos de desesperanza y perdida de interés."
+    },
+    {
+      question: "Diferenciando Ansiedad de trastorno Obsesivo-Compulsivo (TOC): ¿Tus síntomas de ansiedad incluyen recuerdos intrusivos, flashbacks o evitar constantemente las situaciones relacionadas con un evento traumático en particular?",
+      info: "En el TOC, los pensamientos intrusivos llevan a compulsiones específicas. en la ansiedad generalizada, las preocupaciones son más difusas y no están vinculadas a rituales."
+    },
+    {
+      question: "Diferenciando Ansiedad de Trastorno de Estrés Postraumático (TEPT): ¿Tus síntomas de ansiedad están relacionados con un evento traumático que evitas recordar o que te genera flashbacks?",
+      info: "El Trastorno de Estrés Postraumático (TEPT) se caracteriza por estar directamente vinculado a un evento traumático definido, generando reacciones como revivir la experiencia o evitar recordarla. En cambio, la ansiedad generalizada no se asocia necesariamente con un evento específico y tiende a manifestarse como preocupación excesiva sobre diversas áreas de la vida."
+    },
+    {
+      question: "Diferenciando la Ansiedad de Trastorno de Pánico: ¿Experimentas episodios súbitos de miedo intenso con síntomas físicos como taquicardia, dificultad para respirar o sensación de perder el control, que aparecen sin previo aviso?",
+      info: "El trastorno de pánico se caracteriza por ataques intensos y repentinos. La ansiedad generaliza produce una activación física más constante pero menos extrema."
+    },
+    {
+      question: "Diferenciando la Ansiedad de trastornos físicos (como Hiperteroidismo): ¿Has notado que tus síntomas de ansiedad (como taquicardia o sudoración) están presentes incluso cuando no tienes pensamientos preocupantes?",
+      info: "Los trastornos físicos (como el hipotiroidismo) pueden causar síntomas físicos similares a la ansiedad, pero no están asociados a preocupaciones o miedos específicos."
+    },
+    {
+      question: "Diferenciando La Depresión de Trastorno Bipolar: ¿Has experimentado alguna vez episodios de euforia, hiperactividad o impulsividad en los que no necesitas dormir o te sientes invencible?",
+      info: "En el trastorno bipolar, la depresión alterna con episodios de manía o hipomanía, donde los estados de ánimo son muy elevados, con síntomas como euforia y disminución de la necesidad de sueño, mientras que, en la depresión, los síntomas están centrados en tristeza, fatiga y pérdida de interés, sin esos altos de euforia."
+    },
+    {
+      question: "Diferenciando La Depresión de Trastorno Obsesivo-Compulsivo (TOC): ¿Tienes pensamientos recurrentes y perturbadores que te causan angustia, pero que sientes que no puedes evitar si no quieres realizarlos?",
+      info: "En el TOC, los pensamientos son muy intrusivos y se acompañan de compulsiones, mientras que la depresión está más relacionada con la tristeza profunda y la perdida de interés."
+    },
+    {
+      question: "Diferencia con el Trastorno de Personalidad Limite (TLP): ¿Sueles tener cambios de ánimo muy rápidos y sentirte vacío o temer el abandono, a veces de manera extrema?",
+      info: "En el trastorno límite de la personalidad, los cambios de humor son muy rápidos y suelen estar relacionados con las relaciones interpersonales (temor al abandono, reacciones impulsivas). En la depresión, el estado de ánimo generalmente es más constante y se enfoca en la tristeza y desesperanza, sin los cambios extremos relacionados con las relaciones personales."
+    },
+    {
+      question: "Diferenciando La Depresión con los trastornos del sueño (como el Insomnio o la Apnea del sueño): ¿Sientes que no puedes descansar, te cuesta dormir o sientes que no tienes energía, aunque hayas dormido lo suficiente?",
+      info: "En los trastornos del sueño, los síntomas principales están relacionados con la calidad del sueño (dificultad para dormir, insomnio, etc.), pero no incluyen necesariamente los sentimientos de tristeza o desesperanza. En la depresión, la fatiga es más emocional (desinterés, tristeza) y suele ir acompañada de otros síntomas como la pérdida de placer o motivación."
+    },
+    {
+      question: "Diferenciando La Depresión de Trastornos Endocrinos (como Hipotiroidismo): ¿Tus síntomas de fatiga, tristeza o falta de interés persisten incluso después de descansar adecuadamente o cuando no hay estrés emocional evidente?",
+      info: "El hipotiroidismo y otros trastornos endocrinos pueden causar síntomas físicos similares a la depresión, pero suelen estar relacionados con desequilibrios hormonales."
+    },
+    {
+      question: "Diferenciando La Depresión con los Trastornos Psicosomáticos: ¿Tienes dolores o malestares físicos (como dolor de cabeza o de estómago) que no parecen tener una causa médica clara, y además te sientes emocionalmente decaído?",
+      info: "En los trastornos psicosomáticos, el malestar físico no tiene una causa orgánica y puede estar relacionado con el estrés emocional. En la depresión, los síntomas emocionales son más prominentes, aunque los malestares físicos también pueden aparecer como parte de la condición."
+    }
   ];
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Autoevaluación Emocional (Parte 1)</h1>
+      <h1 className={styles.title}>Autoevaluación Emocional</h1>
       <p>
         Este test evaluará tus niveles de ansiedad y depresión. Su propósito es permitir que el Chatbot adapte su comportamiento según tus resultados, ofreciéndote una experiencia más adecuada a tu estado emocional.
       </p>
@@ -234,9 +340,7 @@ const TestFull = () => {
       </p>
 
       <form onSubmit={handleSubmit}>
-        {/* Datos generales */}
-        {/* ... (misma sección de datos generales) */}
-
+        {/* PARTE 1: ANSIEDAD */}
         <h2 className={styles.subtitle}>Autoevaluación de Ansiedad</h2>
         <p className={styles.instructions}>
           <strong>Instrucciones:</strong> Lee cada apartado con calma, selecciona la respuesta que mejor refleje cómo te has sentido durante la última semana, incluido el día de hoy.
@@ -264,13 +368,13 @@ const TestFull = () => {
                   <td key={num}>
                     <input
                       type="radio"
-                      id={`${q.name}_${num}`}
+                      id={`anxiety_${q.name}_${num}`}
                       name={q.name}
                       value={num}
                       checked={answers[q.name] === num}
                       onChange={handleRadioChange}
                     />
-                    <label htmlFor={`${q.name}_${num}`}></label>
+                    <label htmlFor={`anxiety_${q.name}_${num}`}></label>
                   </td>
                 ))}
               </tr>
@@ -278,82 +382,40 @@ const TestFull = () => {
           </tbody>
         </table>
 
+        {/* PARTE 2: DEPRESIÓN - IMPLEMENTACIÓN COMPLETAMENTE NUEVA */}
         <h2 className={styles.subtitle}>Autoevaluación Emocional (Parte 2)</h2>
-        <p className={styles.instructions}><strong>Instrucciones:</strong> Lee cada apartado con calma, marca la respuesta que mejor refleje cómo te has sentido durante la última semana.</p>
-        <p className={styles.instructions}><strong>Importante:</strong> Cada frase por ítem tendrá un número específico que deberán sumar para obtener el resultado obtenido.</p>
+        <p className={styles.instructions}>
+          <strong>Instrucciones:</strong> Lee cada apartado con calma, marca la respuesta que mejor refleje cómo te has sentido durante la última semana.
+        </p>
+        <p className={styles.instructions}>
+          <strong>Importante:</strong> Cada frase por ítem tendrá un número específico que deberán sumar para obtener el resultado obtenido.
+        </p>
 
-        {[...Array(11)].map((_, i) => {
-          // Obtener las opciones para este ítem
-          const itemOptions = depressionItems.slice(i * 5, (i + 1) * 5);
-
-          return (
-            <div key={`depGroup_${i}`} className={styles.radioGroup}>
-              <div className={styles.radioGroupHeader}><strong>Ítem {i + 1}:</strong></div>
-
-              {/* Renderizar cada opción individual directamente, sin map */}
-              <div className={styles.radioOption}>
-                <input
-                  type="radio"
-                  id={`dep_${i}_0`}
-                  name={`dep_${i}`}
-                  value={itemOptions[0][1]}
-                  checked={depressionAnswers[`dep_${i}`] === itemOptions[0][1]}
-                  onChange={handleDepressionChange}
-                />
-                <label htmlFor={`dep_${i}_0`}>{itemOptions[0][0]} ({itemOptions[0][1]})</label>
-              </div>
-
-              <div className={styles.radioOption}>
-                <input
-                  type="radio"
-                  id={`dep_${i}_1`}
-                  name={`dep_${i}`}
-                  value={itemOptions[1][1]}
-                  checked={depressionAnswers[`dep_${i}`] === itemOptions[1][1]}
-                  onChange={handleDepressionChange}
-                />
-                <label htmlFor={`dep_${i}_1`}>{itemOptions[1][0]} ({itemOptions[1][1]})</label>
-              </div>
-
-              <div className={styles.radioOption}>
-                <input
-                  type="radio"
-                  id={`dep_${i}_2`}
-                  name={`dep_${i}`}
-                  value={itemOptions[2][1]}
-                  checked={depressionAnswers[`dep_${i}`] === itemOptions[2][1]}
-                  onChange={handleDepressionChange}
-                />
-                <label htmlFor={`dep_${i}_2`}>{itemOptions[2][0]} ({itemOptions[2][1]})</label>
-              </div>
-
-              <div className={styles.radioOption}>
-                <input
-                  type="radio"
-                  id={`dep_${i}_3`}
-                  name={`dep_${i}`}
-                  value={itemOptions[3][1]}
-                  checked={depressionAnswers[`dep_${i}`] === itemOptions[3][1]}
-                  onChange={handleDepressionChange}
-                />
-                <label htmlFor={`dep_${i}_3`}>{itemOptions[3][0]} ({itemOptions[3][1]})</label>
-              </div>
-
-              <div className={styles.radioOption}>
-                <input
-                  type="radio"
-                  id={`dep_${i}_4`}
-                  name={`dep_${i}`}
-                  value={itemOptions[4][1]}
-                  checked={depressionAnswers[`dep_${i}`] === itemOptions[4][1]}
-                  onChange={handleDepressionChange}
-                />
-                <label htmlFor={`dep_${i}_4`}>{itemOptions[4][0]} ({itemOptions[4][1]})</label>
-              </div>
+        {/* Usando una aproximación completamente nueva */}
+        {depressionOptions.map((options, itemIndex) => (
+          <div key={`depression_item_${itemIndex}`} className={styles.radioGroup}>
+            <div className={styles.radioGroupHeader}>
+              <strong>Ítem {itemIndex + 1}:</strong>
             </div>
-          );
-        })}
+            
+            {options.map((option, optIndex) => (
+              <div key={`depression_option_${itemIndex}_${optIndex}`} className={styles.radioOption}>
+                <input
+                  type="radio"
+                  id={`depression_direct_${itemIndex}_${optIndex}`}
+                  name={`depression_item_${itemIndex}`}
+                  checked={selectedOptions[`item${itemIndex}`] === optIndex}
+                  onChange={() => handleDepressionSelection(itemIndex, optIndex)}
+                />
+                <label htmlFor={`depression_direct_${itemIndex}_${optIndex}`}>
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        ))}
 
+        {/* PARTE 3: EVALUACIÓN DIFERENCIAL */}
         <h2 className={styles.subtitle}>Autoevaluación Emocional (Parte 3)</h2>
         <p className={styles.instructions}>
           <strong>Instrucciones, Preguntas Extra:</strong> las siguientes preguntas son para evitar confundir la ansiedad
@@ -361,72 +423,26 @@ const TestFull = () => {
           no tendrán respuestas correctas o incorrectas.
         </p>
 
-        {[
-          {
-            question: "Diferenciando la Ansiedad de la Depresión mayor: ¿Con qué frecuencia te sientes preocupado o nervioso por el futuro, en comparación con sentirte triste, sin esperanza o sin interés en las cosas que solías disfrutar?",
-            info: "La ansiedad se enfoca en preocupaciones y temor al futuro, mientras que la depresión está más relacionada con sentimientos de desesperanza y perdida de interés."
-          },
-          {
-            question: "Diferenciando Ansiedad de trastorno Obsesivo-Compulsivo (TOC): ¿Tus síntomas de ansiedad incluyen recuerdos intrusivos, flashbacks o evitar constantemente las situaciones relacionadas con un evento traumático en particular?",
-            info: "En el TOC, los pensamientos intrusivos llevan a compulsiones específicas. en la ansiedad generalizada, las preocupaciones son más difusas y no están vinculadas a rituales."
-          },
-          {
-            question: "Diferenciando Ansiedad de Trastorno de Estrés Postraumático (TEPT): ¿Tus síntomas de ansiedad están relacionados con un evento traumático que evitas recordar o que te genera flashbacks?",
-            info: "El Trastorno de Estrés Postraumático (TEPT) se caracteriza por estar directamente vinculado a un evento traumático definido, generando reacciones como revivir la experiencia o evitar recordarla. En cambio, la ansiedad generalizada no se asocia necesariamente con un evento específico y tiende a manifestarse como preocupación excesiva sobre diversas áreas de la vida."
-          },
-          {
-            question: "Diferenciando la Ansiedad de Trastorno de Pánico: ¿Experimentas episodios súbitos de miedo intenso con síntomas físicos como taquicardia, dificultad para respirar o sensación de perder el control, que aparecen sin previo aviso?",
-            info: "El trastorno de pánico se caracteriza por ataques intensos y repentinos. La ansiedad generaliza produce una activación física más constante pero menos extrema."
-          },
-          {
-            question: "Diferenciando la Ansiedad de trastornos físicos (como Hiperteroidismo): ¿Has notado que tus síntomas de ansiedad (como taquicardia o sudoración) están presentes incluso cuando no tienes pensamientos preocupantes?",
-            info: "Los trastornos físicos (como el hipotiroidismo) pueden causar síntomas físicos similares a la ansiedad, pero no están asociados a preocupaciones o miedos específicos."
-          },
-          {
-            question: "Diferenciando La Depresión de Trastorno Bipolar: ¿Has experimentado alguna vez episodios de euforia, hiperactividad o impulsividad en los que no necesitas dormir o te sientes invencible?",
-            info: "En el trastorno bipolar, la depresión alterna con episodios de manía o hipomanía, donde los estados de ánimo son muy elevados, con síntomas como euforia y disminución de la necesidad de sueño, mientras que, en la depresión, los síntomas están centrados en tristeza, fatiga y pérdida de interés, sin esos altos de euforia."
-          },
-          {
-            question: "Diferenciando La Depresión de Trastorno Obsesivo-Compulsivo (TOC): ¿Tienes pensamientos recurrentes y perturbadores que te causan angustia, pero que sientes que no puedes evitar si no quieres realizarlos?",
-            info: "En el TOC, los pensamientos son muy intrusivos y se acompañan de compulsiones, mientras que la depresión está más relacionada con la tristeza profunda y la perdida de interés."
-          },
-          {
-            question: "Diferencia con el Trastorno de Personalidad Limite (TLP): ¿Sueles tener cambios de ánimo muy rápidos y sentirte vacío o temer el abandono, a veces de manera extrema?",
-            info: "En el trastorno límite de la personalidad, los cambios de humor son muy rápidos y suelen estar relacionados con las relaciones interpersonales (temor al abandono, reacciones impulsivas). En la depresión, el estado de ánimo generalmente es más constante y se enfoca en la tristeza y desesperanza, sin los cambios extremos relacionados con las relaciones personales."
-          },
-          {
-            question: "Diferenciando La Depresión con los trastornos del sueño (como el Insomnio o la Apnea del sueño): ¿Sientes que no puedes descansar, te cuesta dormir o sientes que no tienes energía, aunque hayas dormido lo suficiente?",
-            info: "En los trastornos del sueño, los síntomas principales están relacionados con la calidad del sueño (dificultad para dormir, insomnio, etc.), pero no incluyen necesariamente los sentimientos de tristeza o desesperanza. En la depresión, la fatiga es más emocional (desinterés, tristeza) y suele ir acompañada de otros síntomas como la pérdida de placer o motivación."
-          },
-          {
-            question: "Diferenciando La Depresión de Trastornos Endocrinos (como Hipotiroidismo): ¿Tus síntomas de fatiga, tristeza o falta de interés persisten incluso después de descansar adecuadamente o cuando no hay estrés emocional evidente?",
-            info: "El hipotiroidismo y otros trastornos endocrinos pueden causar síntomas físicos similares a la depresión, pero suelen estar relacionados con desequilibrios hormonales."
-          },
-          {
-            question: "Diferenciando La Depresión con los Trastornos Psicosomáticos: ¿Tienes dolores o malestares físicos (como dolor de cabeza o de estómago) que no parecen tener una causa médica clara, y además te sientes emocionalmente decaído?",
-            info: "En los trastornos psicosomáticos, el malestar físico no tiene una causa orgánica y puede estar relacionado con el estrés emocional. En la depresión, los síntomas emocionales son más prominentes, aunque los malestares físicos también pueden aparecer como parte de la condición."
-          }
-        ].map((item, index) => (
+        {differentialQuestions.map((item, index) => (
           <div key={`extra_question_${index}`} className={styles.extraQuestion}>
             <p><strong>{item.question}</strong></p>
             <div className={styles.extraOptions}>
               {['Nunca', 'Raramente', 'A veces', 'Frecuentemente', 'Siempre'].map((option, optIdx) => (
-                <div key={`extra_${index}_${optIdx}`} className={styles.radioOption}>
+                <div key={`differential_${index}_${optIdx}`} className={styles.radioOption}>
                   <div className={styles.radioInputWrapper}>
                     <input
                       type="radio"
-                      id={`extra_${index}_${optIdx}`}
+                      id={`differential_${index}_${optIdx}`}
                       name={`extra_${index}`}
                       value={optIdx}
                       checked={extraAnswers[`extra_${index}`] === optIdx}
-                      onChange={(e) => {
-                        const { name, value } = e.target;
-                        setExtraAnswers({ ...extraAnswers, [name]: parseInt(value) });
-                      }}
+                      onChange={handleExtraChange}
                     />
-                    <label htmlFor={`extra_${index}_${optIdx}`} className={styles.radioMark}></label>
+                    <label htmlFor={`differential_${index}_${optIdx}`}>
+                      <span className={styles.radioMark}></span>
+                      <span className={styles.radioText}>{option}</span>
+                    </label>
                   </div>
-                  <label htmlFor={`extra_${index}_${optIdx}`} className={styles.radioText}>{option}</label>
                 </div>
               ))}
             </div>
@@ -436,7 +452,7 @@ const TestFull = () => {
           </div>
         ))}
 
-        <button type="submit">Calcular puntaje</button>
+        <button type="submit" className={styles.submitButton}>Calcular puntaje</button>
 
         {error && <div className={styles.error}>{error}</div>}
         {isLoading && <div className={styles.loadingState}>Procesando resultados...</div>}
@@ -481,7 +497,7 @@ const TestFull = () => {
                   ? 'Podría haber otros factores o condiciones que merecen atención adicional. Considera una evaluación más específica.'
                   : 'No se detectan indicadores significativos de otros trastornos relacionados.'
               }</p>
-              <p>Las respuestas &quot;Frecuentemente&quot; o &quout;Siempre&quout; en múltiples preguntas de esta sección pueden indicar la presencia de otros trastornos que podrían confundirse con ansiedad o depresión.</p>
+              <p>Las respuestas &quot;Frecuentemente&quot; o &quot;Siempre&quot; en múltiples preguntas de esta sección pueden indicar la presencia de otros trastornos que podrían confundirse con ansiedad o depresión.</p>
             </div>
 
             <div className={styles.warning}>
@@ -494,6 +510,5 @@ const TestFull = () => {
     </div>
   );
 };
-
 
 export default TestFull;

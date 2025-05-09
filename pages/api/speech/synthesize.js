@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 // Función auxiliar para convertir un ReadableStream a Buffer
 async function streamToBuffer(stream) {
     const chunks = [];
-    
+
     // Si es un Readable de Node.js
     if (stream instanceof Readable) {
         return new Promise((resolve, reject) => {
@@ -13,16 +13,16 @@ async function streamToBuffer(stream) {
             stream.on('end', () => resolve(Buffer.concat(chunks)));
         });
     }
-    
+
     // Si es un ReadableStream web
     const reader = stream.getReader();
-    
+
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         chunks.push(value);
     }
-    
+
     return Buffer.concat(chunks);
 }
 
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
                 output_format: "mp3_44100_128", // Formato de alta calidad similar a Azure
             }
         );
-        
+
         // Convertir el stream a buffer
         const audioBuffer = await streamToBuffer(audioStream);
 

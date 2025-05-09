@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone, faPlay, faPause, faVolumeMute, faTrash, faRobot, faUser } from '@fortawesome/free-solid-svg-icons';
+import {
+    faMicrophone, faPlay, faPause, faVolumeMute, faTrash,
+    faRobot, faUser, faPlus, faList, faEdit, faCheck
+} from '@fortawesome/free-solid-svg-icons';
 import WaveSurfer from 'wavesurfer.js';
 import styles from '../styles/Chat.module.css';
 import { useRouter } from 'next/router';
-// Dentro del componente Chat, añade:
-
 
 export default function Chat() {
     const [messages, setMessages] = useState([]);
@@ -16,6 +17,14 @@ export default function Chat() {
     const [isLoading, setIsLoading] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
     const [playingAudio, setPlayingAudio] = useState(null);
+
+    // Estados para el manejo de múltiples chats
+    const [userChats, setUserChats] = useState([]);
+    const [currentChatId, setCurrentChatId] = useState(null);
+    const [newChatName, setNewChatName] = useState('');
+    const [isCreatingChat, setIsCreatingChat] = useState(false);
+    const [isEditingChat, setIsEditingChat] = useState(false);
+    const [editChatId, setEditChatId] = useState(null);
 
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
@@ -32,9 +41,171 @@ export default function Chat() {
         if (!token || !username) {
             alert('No hay una sesión activa. Por favor, inicia sesión.');
             router.push('/login');
+            return;
         }
+
+        // Cargar los chats del usuario al iniciar
+        loadUserChats();
     }, [router]);
 
+    // Cargar los chats del usuario desde la base de datos
+    const loadUserChats = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No hay sesión activa');
+            }
+
+            const response = await fetch('/api/chat/list', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar los chats');
+            }
+
+            const { chats } = await response.json();
+            setUserChats(chats);
+
+            // Si hay chats, seleccionar el primero por defecto
+            if (chats.length > 0) {
+                loadChat(chats[0].id);
+            }
+        } catch (error) {
+            console.error('Error al cargar los chats:', error);
+            alert(`Error al cargar los chats: ${error.message}`);
+        }
+    };
+
+    // Crear un nuevo chat
+    const createNewChat = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No hay sesión activa');
+            }
+
+            // Nombre por defecto si no se proporciona uno
+            const chatName = newChatName.trim() || `Chat del ${new Date().toLocaleDateString()}`;
+
+            const response = await fetch('/api/chat/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: chatName })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al crear el chat');
+            }
+
+            const { chatId } = await response.json();
+
+            // Actualizar la lista de chats
+            await loadUserChats();
+
+            // Seleccionar el nuevo chat
+            loadChat(chatId);
+
+            // Limpiar el estado
+            setNewChatName('');
+            setIsCreatingChat(false);
+        } catch (error) {
+            console.error('Error al crear nuevo chat:', error);
+            alert(`Error al crear nuevo chat: ${error.message}`);
+        }
+    };
+
+    // Editar el nombre de un chat
+    const updateChatName = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token || !editChatId) {
+                throw new Error('No hay sesión activa o chat seleccionado');
+            }
+
+            const chatName = newChatName.trim();
+            if (!chatName) {
+                throw new Error('El nombre del chat no puede estar vacío');
+            }
+
+            const response = await fetch('/api/chat/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chatId: editChatId,
+                    name: chatName
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar el chat');
+            }
+
+            // Actualizar la lista de chats
+            await loadUserChats();
+
+            // Limpiar el estado
+            setNewChatName('');
+            setIsEditingChat(false);
+            setEditChatId(null);
+        } catch (error) {
+            console.error('Error al actualizar chat:', error);
+            alert(`Error al actualizar chat: ${error.message}`);
+        }
+    };
+
+    // Cargar un chat específico
+    const loadChat = async (chatId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error('No hay sesión activa');
+            }
+
+            // Detener cualquier audio que se esté reproduciendo
+            stopAllAudio();
+
+            // Limpiar los wavesurfers existentes
+            Object.values(wavesurferRefs.current).forEach(wavesurfer => {
+                try {
+                    wavesurfer.destroy();
+                } catch (e) {
+                    console.error('Error al destruir wavesurfer:', e);
+                }
+            });
+            wavesurferRefs.current = {};
+
+            const response = await fetch(`/api/chat/${chatId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar el chat');
+            }
+
+            const { messages: chatMessages, history } = await response.json();
+
+            // Establecer el chat actual y sus mensajes
+            setCurrentChatId(chatId);
+            setMessages(chatMessages);
+            setChatHistory(history || []);
+        } catch (error) {
+            console.error('Error al cargar chat:', error);
+            alert(`Error al cargar chat: ${error.message}`);
+        }
+    };
 
     // Cargar mensajes al iniciar
     useEffect(() => {
@@ -45,6 +216,11 @@ export default function Chat() {
     // Función para iniciar la grabación
     const startRecording = async () => {
         try {
+            // Verificar si hay un chat activo
+            if (!currentChatId) {
+                throw new Error('No hay un chat activo. Por favor, crea o selecciona un chat.');
+            }
+
             // Detener cualquier audio que se esté reproduciendo
             stopAllAudio();
 
@@ -75,7 +251,7 @@ export default function Chat() {
             setIsRecording(true);
         } catch (error) {
             console.error('Error accessing microphone:', error);
-            alert('No se pudo acceder al micrófono. Por favor, verifica los permisos.');
+            alert(`Error: ${error.message}`);
         }
     };
 
@@ -141,7 +317,8 @@ export default function Chat() {
         // Resetear estado
         setPlayingAudio(null);
     };
-    // Modifica la función processRecordedAudio para incluir el token en la solicitud
+
+    // Procesar el audio grabado
     const processRecordedAudio = async (audioBlob) => {
         setIsLoading(true);
 
@@ -160,7 +337,7 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Añadir token de autorización
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     audioData: base64Audio,
@@ -178,14 +355,37 @@ export default function Chat() {
             const userAudioURL = URL.createObjectURL(audioBlob);
             const userMessageId = Date.now();
 
+            // Guardar el mensaje del usuario en la base de datos
+            const saveUserMessageResponse = await fetch('/api/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chatId: currentChatId,
+                    content: transcript,
+                    audioData: base64Audio,
+                    isBot: false
+                }),
+            });
+
+            if (!saveUserMessageResponse.ok) {
+                throw new Error('Error al guardar el mensaje del usuario');
+            }
+
+            const { messageId: dbUserMessageId } = await saveUserMessageResponse.json();
+
             // Actualizar los mensajes con la intervención del usuario
             setMessages(prevMessages => [
                 ...prevMessages,
                 {
-                    id: userMessageId,
+                    id: dbUserMessageId, // Usar el ID de la base de datos
+                    clientId: userMessageId, // ID temporal para el cliente
                     sender: 'Usuario',
                     isBot: false,
                     audioUrl: userAudioURL,
+                    content: transcript,
                     duration: '...',  // Duración temporal, se actualizará cuando el audio esté cargado
                     timestamp: new Date().toISOString()
                 }
@@ -196,9 +396,10 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Añadir token de autorización
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
+                    chatId: currentChatId,
                     message: transcript,
                     chatHistory: chatHistory,
                 }),
@@ -216,7 +417,7 @@ export default function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Añadir token de autorización
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     text: response,
@@ -229,16 +430,39 @@ export default function Chat() {
 
             const { audioData } = await synthesizeResponse.json();
 
+            // Guardar el mensaje del bot en la base de datos
+            const saveBotMessageResponse = await fetch('/api/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chatId: currentChatId,
+                    content: response,
+                    audioData: audioData,
+                    isBot: true
+                }),
+            });
+
+            if (!saveBotMessageResponse.ok) {
+                throw new Error('Error al guardar el mensaje del bot');
+            }
+
+            const { messageId: dbBotMessageId } = await saveBotMessageResponse.json();
+
             // Actualizar los mensajes con la respuesta del bot
             const botMessageId = Date.now() + 100; // Un offset mayor para garantizar unicidad
             setMessages(prevMessages => {
                 const newMessages = [
                     ...prevMessages,
                     {
-                        id: botMessageId,
+                        id: dbBotMessageId, // Usar el ID de la base de datos
+                        clientId: botMessageId, // ID temporal para el cliente
                         sender: 'Serenity',
                         isBot: true,
                         audioUrl: audioData,
+                        content: response,
                         duration: '...',  // Duración temporal, se actualizará cuando el audio esté cargado
                         timestamp: new Date().toISOString()
                     }
@@ -246,8 +470,8 @@ export default function Chat() {
 
                 // Solo intentar reproducir después de un tiempo para asegurar que todo esté cargado
                 setTimeout(() => {
-                    if (wavesurferRefs.current[botMessageId]) {
-                        playAudio(botMessageId, audioData);
+                    if (wavesurferRefs.current[dbBotMessageId]) {
+                        playAudio(dbBotMessageId, audioData);
                     }
                 }, 2000);
 
@@ -287,8 +511,13 @@ export default function Chat() {
         return `${minutes}:${formattedSeconds}`;
     };
 
-    // Función para limpiar la conversación
+    // Función para limpiar la conversación actual (no elimina de la base de datos)
     const clearConversation = () => {
+        // Confirmar la acción
+        if (!confirm('¿Estás seguro de que deseas limpiar esta conversación? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
         // Detener cualquier audio que se esté reproduciendo
         stopAllAudio();
 
@@ -309,9 +538,38 @@ export default function Chat() {
             }
         });
 
-        // Limpiar mensajes y historial
+        // Limpiar mensajes y historial de la UI
         setMessages([]);
         setChatHistory([]);
+
+        // Solicitar borrado en la base de datos
+        deleteCurrentChatMessages();
+    };
+
+    // Función para eliminar los mensajes del chat actual
+    const deleteCurrentChatMessages = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token || !currentChatId) {
+                throw new Error('No hay sesión activa o chat seleccionado');
+            }
+
+            const response = await fetch(`/api/chat/${currentChatId}/messages`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar los mensajes');
+            }
+
+            // No es necesario hacer nada más, ya limpiamos la UI
+        } catch (error) {
+            console.error('Error al eliminar mensajes:', error);
+            alert(`Error al eliminar mensajes: ${error.message}`);
+        }
     };
 
     // Inicializar WaveSurfer de manera más controlada
@@ -388,11 +646,19 @@ export default function Chat() {
                 }
             }
         });
-
-
-
     }, [messages]);
 
+    // Formatear fecha para mostrar en la lista de chats
+    const formatChatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
+    // Renderizar el componente de chat
     return (
         <div className={styles.appContainer}>
             <Head>
@@ -410,57 +676,194 @@ export default function Chat() {
                 className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}
                 onMouseLeave={() => setSidebarOpen(false)}
             >
+                <div className={styles.sidebarHeader}>
+                    <h3>Mis conversaciones</h3>
+                    <button
+                        className={styles.newChatButton}
+                        onClick={() => {
+                            setIsCreatingChat(true);
+                            setIsEditingChat(false);
+                            setNewChatName('');
+                        }}
+                    >
+                        <FontAwesomeIcon icon={faPlus} /> Nuevo chat
+                    </button>
+                </div>
+
+                {isCreatingChat && (
+                    <div className={styles.chatFormContainer}>
+                        <input
+                            type="text"
+                            value={newChatName}
+                            onChange={(e) => setNewChatName(e.target.value)}
+                            placeholder="Nombre del chat"
+                            className={styles.chatNameInput}
+                        />
+                        <div className={styles.chatFormButtons}>
+                            <button
+                                onClick={createNewChat}
+                                className={styles.confirmButton}
+                            >
+                                <FontAwesomeIcon icon={faCheck} />
+                            </button>
+                            <button
+                                onClick={() => setIsCreatingChat(false)}
+                                className={styles.cancelButton}
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {isEditingChat && (
+                    <div className={styles.chatFormContainer}>
+                        <input
+                            type="text"
+                            value={newChatName}
+                            onChange={(e) => setNewChatName(e.target.value)}
+                            placeholder="Nuevo nombre"
+                            className={styles.chatNameInput}
+                        />
+                        <div className={styles.chatFormButtons}>
+                            <button
+                                onClick={updateChatName}
+                                className={styles.confirmButton}
+                            >
+                                <FontAwesomeIcon icon={faCheck} />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsEditingChat(false);
+                                    setEditChatId(null);
+                                    setNewChatName('');
+                                }}
+                                className={styles.cancelButton}
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className={styles.chatHistory}>
-                    <div className={styles.chatItem}>Chat #1 - 20/11/2024</div>
-                    <div className={styles.chatItem}>Chat #2 - 19/11/2024</div>
-                    <div className={styles.chatItem}>Chat #3 - 18/11/2024</div>
+                    {userChats.length === 0 ? (
+                        <div className={styles.noChats}>
+                            No tienes conversaciones. ¡Crea tu primer chat!
+                        </div>
+                    ) : (
+                        userChats.map(chat => (
+                            <div
+                                key={chat.id}
+                                className={`${styles.chatItem} ${currentChatId === chat.id ? styles.activeChat : ''}`}
+                                onClick={() => loadChat(chat.id)}
+                            >
+                                <div className={styles.chatItemContent}>
+                                    <FontAwesomeIcon icon={faList} className={styles.chatIcon} />
+                                    <div>
+                                        <div className={styles.chatName}>{chat.name}</div>
+                                        <div className={styles.chatDate}>
+                                            {formatChatDate(chat.created_at)}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    className={styles.editChatButton}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsEditingChat(true);
+                                        setIsCreatingChat(false);
+                                        setEditChatId(chat.id);
+                                        setNewChatName(chat.name);
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faEdit} />
+                                </button>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
             <div className={styles.chatContainer}>
                 <div className={styles.chatHeader}>
                     <FontAwesomeIcon icon={faMicrophone} />
-                    <h2>Chat de voz</h2>
+                    <h2>
+                        {currentChatId ? (
+                            userChats.find(chat => chat.id === currentChatId)?.name || 'Chat de voz'
+                        ) : (
+                            'Chat de voz'
+                        )}
+                    </h2>
                 </div>
 
                 <div className={styles.chatMessages}>
-                    {messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className={`${styles.message} ${!message.isBot ? styles.user : ''}`}
-                        >
-                            <div className={styles.avatarContainer}>
-                                <div className={styles.avatar}>
-                                    <FontAwesomeIcon icon={message.isBot ? faRobot : faUser} />
-                                </div>
-                                <span className={styles.avatarName}>{message.sender}</span>
-                            </div>
-
-                            <div className={styles.audioMessage}>
-                                <div className={styles.audioControls}>
-                                    <button
-                                        className={styles.playButton}
-                                        onClick={() => {
-                                            if (playingAudio && playingAudio.id === message.id) {
-                                                pauseAudio();
-                                            } else {
-                                                playAudio(message.id, message.audioUrl);
-                                            }
-                                        }}
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={playingAudio && playingAudio.id === message.id ? faPause : faPlay}
-                                        />
-                                    </button>
-                                </div>
-                                <div
-                                    id={`waveform-${message.id}`}
-                                    className={styles.waveform}
-                                ></div>
-                                <span className={styles.time}>{message.duration}</span>
-                            </div>
+                    {!currentChatId ? (
+                        <div className={styles.noChatSelected}>
+                            <p>Selecciona un chat existente o crea uno nuevo para comenzar.</p>
+                            <button
+                                className={styles.createChatPrompt}
+                                onClick={() => {
+                                    setIsCreatingChat(true);
+                                    setIsEditingChat(false);
+                                    setNewChatName('');
+                                    setSidebarOpen(true);
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faPlus} /> Crear nuevo chat
+                            </button>
                         </div>
-                    ))}
+                    ) : messages.length === 0 ? (
+                        <div className={styles.emptyChat}>
+                            <p>No hay mensajes en este chat.</p>
+                            <p>Presiona el botón del micrófono para comenzar a hablar.</p>
+                        </div>
+                    ) : (
+                        messages.map((message) => (
+                            <div
+                                key={message.id}
+                                className={`${styles.message} ${!message.isBot ? styles.user : ''}`}
+                            >
+                                <div className={styles.avatarContainer}>
+                                    <div className={styles.avatar}>
+                                        <FontAwesomeIcon icon={message.isBot ? faRobot : faUser} />
+                                    </div>
+                                    <span className={styles.avatarName}>{message.sender}</span>
+                                </div>
+
+                                <div className={styles.audioMessage}>
+                                    <div className={styles.audioControls}>
+                                        <button
+                                            className={styles.playButton}
+                                            onClick={() => {
+                                                if (playingAudio && playingAudio.id === message.id) {
+                                                    pauseAudio();
+                                                } else {
+                                                    playAudio(message.id, message.audioUrl);
+                                                }
+                                            }}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={playingAudio && playingAudio.id === message.id ? faPause : faPlay}
+                                            />
+                                        </button>
+                                    </div>
+                                    <div
+                                        id={`waveform-${message.id}`}
+                                        className={styles.waveform}
+                                    ></div>
+                                    <span className={styles.time}>{message.duration}</span>
+
+                                    {/* Mostrar el contenido/transcripción del mensaje */}
+                                    {message.content && (
+                                        <div className={styles.messageContent}>
+                                            <p>{message.content}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
                     <div ref={messageEndRef} />
                 </div>
 
@@ -468,7 +871,8 @@ export default function Chat() {
                     <button
                         className={`${styles.footerButton} ${isRecording ? styles.recording : ''}`}
                         onClick={isRecording ? stopRecording : startRecording}
-                        disabled={isLoading}
+                        disabled={isLoading || !currentChatId}
+                        title={!currentChatId ? "Selecciona o crea un chat primero" : (isRecording ? "Detener grabación" : "Iniciar grabación")}
                     >
                         <FontAwesomeIcon icon={faMicrophone} />
                     </button>
@@ -477,6 +881,7 @@ export default function Chat() {
                         className={styles.footerButton}
                         onClick={pauseAudio}
                         disabled={!playingAudio}
+                        title="Silenciar reproducción"
                     >
                         <FontAwesomeIcon icon={faVolumeMute} />
                     </button>
@@ -484,7 +889,8 @@ export default function Chat() {
                     <button
                         className={styles.footerButton}
                         onClick={clearConversation}
-                        disabled={messages.length === 0}
+                        disabled={!currentChatId || messages.length === 0}
+                        title="Limpiar conversación"
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>

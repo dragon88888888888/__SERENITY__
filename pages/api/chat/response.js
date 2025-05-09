@@ -1,4 +1,5 @@
-// pages/api/chat/response.js
+// Reemplaza el código en pages/api/chat/response.js para incluir el chatId
+
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
 import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
@@ -102,13 +103,13 @@ function generatePersonalizedInstructions(user, testResults) {
                 - Ansiedad: ${ansiedadInterpretacion}
                 - Estado de ánimo: ${depresionInterpretacion}`;
 
-                if (ansiedadScore > 12 || depresionScore > 15) {
-                    instrucciones += `
+    if (ansiedadScore > 12 || depresionScore > 15) {
+        instrucciones += `
 
                 Dado que la situación emocional actual es desafiante, sé especialmente sensible y comprensivo. Valida sus emociones y sugiere suavemente considerar buscar ayuda profesional adicional cuando sea apropiado, actuando como un amigo preocupado.`;
-                }
+    }
 
-                instrucciones += `
+    instrucciones += `
 
                 RECUERDA SIEMPRE:
                 - Si menciona pensamientos relacionados con autolesión o situaciones de desesperación severa, recomienda claramente buscar ayuda profesional urgente, tal como lo haría un amigo preocupado.`;
@@ -122,10 +123,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { message, chatHistory = [] } = req.body;
+        const { chatId, message, chatHistory = [] } = req.body;
 
-        if (!message) {
-            return res.status(400).json({ message: 'Message is required' });
+        if (!message || !chatId) {
+            return res.status(400).json({ message: 'Message and chatId are required' });
         }
 
         // Obtener el token de autenticación
@@ -138,6 +139,16 @@ export default async function handler(req, res) {
         const user = await getUserFromToken(authToken);
         if (!user) {
             return res.status(401).json({ message: 'Usuario no encontrado o token inválido.' });
+        }
+
+        // Verificar que el chat pertenezca al usuario
+        const chatCheck = await executeQuery(
+            'SELECT id FROM chats WHERE id = ? AND user_id = ?',
+            [chatId, user.id]
+        );
+
+        if (chatCheck.length === 0) {
+            return res.status(404).json({ message: 'Chat no encontrado' });
         }
 
         // Obtener los resultados del test para el usuario
